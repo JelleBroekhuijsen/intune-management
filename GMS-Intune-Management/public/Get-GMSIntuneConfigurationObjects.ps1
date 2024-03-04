@@ -2,13 +2,12 @@ function Get-GMSIntuneConfigurationObjects {
     [CmdletBinding()]
     param (
         [Parameter(Mandatory)]
-        [ValidateSet("deviceConfigurations", "configurationPolicies", "policySets")]
-        [string[]]
+        [object[]]
         $configurationObjectTypes
     )
 
     $configurationObjectTypes | ForEach-Object {
-        $outputFolder = "C:\repos\jll.io Consultancy\intune-management\$_"
+        $outputFolder = "C:\repos\jll.io Consultancy\intune-management\$($_.GMSObjectType)"
         if (-not (Test-Path $outputFolder)) {
             New-Item -ItemType Directory -Path $outputFolder
         }
@@ -17,11 +16,18 @@ function Get-GMSIntuneConfigurationObjects {
         }
     
         # Retrieve all settings policy sets
-        $objectSet = Invoke-GMSIntuneGraphRequest -Endpoint $_ -Method GET -Paging
+        
+        if($_.ExpandQuery){
+            $objectSet = Invoke-GMSIntuneGraphRequest -Endpoint $_.GMSObjectType -Method GET -Paging -Query $_.ExpandQuery
+        }
+        else{
+            $objectSet = Invoke-GMSIntuneGraphRequest -Endpoint $_.GMSObjectType -Method GET -Paging
+        }
+
     
         foreach ($object in $objectSet) {
             # Set file identifier for the object
-            $fileIdentifier = $Global:GMSIntuneConfigurationObjects | Where-Object GMSObjectType -eq $_ | Select-Object -ExpandProperty GMSFileIdentifier
+            $fileIdentifier = $Global:GMSIntuneConfigurationObjects | Where-Object GMSObjectType -eq $_.GMSObjectType | Select-Object -ExpandProperty GMSFileIdentifier
 
             # Sanitize the display name to avoid illegal characters in the file name
             $displayName = $object.$fileIdentifier -replace '[\\\/\:\*\?\"\<\>\|]', ''

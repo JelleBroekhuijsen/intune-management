@@ -1,7 +1,8 @@
 [
     {
         "GMSObjectType": "deviceConfigurations",
-        "GMSFileIdentifier": "displayName"
+        "GMSFileIdentifier": "displayName",
+        "ExpandQuery": "$expand=Items"
     },
     {
         "GMSObjectType": "policySets",
