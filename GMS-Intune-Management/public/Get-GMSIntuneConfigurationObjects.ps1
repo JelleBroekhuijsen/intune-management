@@ -20,10 +20,13 @@ function Get-GMSIntuneConfigurationObjects {
         $objectSet = Invoke-GMSIntuneGraphRequest -Endpoint $_ -Method GET -Paging
     
         foreach ($object in $objectSet) {
+            # Set file identifier for the object
+            $fileIdentifier = $Global:GMSIntuneConfigurationObjects | Where-Object GMSObjectType -eq $_ | Select-Object -ExpandProperty GMSFileIdentifier
+
             # Sanitize the display name to avoid illegal characters in the file name
-            $displayName = $policySet.displayName -replace '[\\\/\:\*\?\"\<\>\|]', ''
+            $displayName = $object.$fileIdentifier -replace '[\\\/\:\*\?\"\<\>\|]', ''
     
-            $object | ConvertTo-Json | Out-File -FilePath "$outputFolder\$($displayName).json" -Force
+            $object | ConvertTo-Json -Depth 100 | Out-File -FilePath "$outputFolder\$($displayName).json" -Force
         }
     }
 }

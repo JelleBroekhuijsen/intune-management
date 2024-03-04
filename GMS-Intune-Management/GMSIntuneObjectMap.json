@@ -1,0 +1,14 @@
+[
+    {
+        "GMSObjectType": "deviceConfigurations",
+        "GMSFileIdentifier": "displayName"
+    },
+    {
+        "GMSObjectType": "policySets",
+        "GMSFileIdentifier": "displayName"
+    },
+    {
+        "GMSObjectType": "configurationPolicies",
+        "GMSFileIdentifier": "name"
+    }
+]

@@ -10,6 +10,8 @@ foreach ($import in @($Public + $Private)) {
     }
 }
 
+$Global:GMSIntuneConfigurationObjects = Get-Content -Path $PSScriptRoot'\GMSIntuneObjectMap.json' -Raw | ConvertFrom-Json
+
 $baseUrl = 'https://graph.microsoft.com'
 
 $headers = @{
