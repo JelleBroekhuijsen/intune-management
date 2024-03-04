@@ -2,14 +2,18 @@
     {
         "GMSObjectType": "deviceConfigurations",
         "GMSFileIdentifier": "displayName",
-        "ExpandQuery": "$expand=Items"
+        "ApiEndpoint": "/deviceManagement/deviceConfigurations"
     },
     {
         "GMSObjectType": "policySets",
-        "GMSFileIdentifier": "displayName"
+        "GMSFileIdentifier": "displayName",
+        "ApiEndpoint": "/deviceAppManagement/policySets",
+        "ExpandQuery": "?$expand=Items"
     },
     {
         "GMSObjectType": "configurationPolicies",
-        "GMSFileIdentifier": "name"
+        "GMSFileIdentifier": "name",
+        "ApiEndpoint": "/deviceManagement/configurationPolicies",
+        "ExpandQuery": "?$expand=Settings"
     }
 ]

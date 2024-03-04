@@ -5,13 +5,12 @@ function Invoke-GMSIntuneGraphRequest {
         $BaseUrl = "https://graph.microsoft.com/beta",
 
         [Parameter(Mandatory)]
-        [ValidateSet("deviceConfigurations", "configurationPolicies", "policySets")]
         [string]
         $Endpoint,
 
         [Parameter()]
         [string]
-        $FilterQuery,
+        $Query,
         
         [Parameter(Mandatory)]
         [ValidateSet("GET", "POST", "DELETE")]
@@ -25,11 +24,8 @@ function Invoke-GMSIntuneGraphRequest {
 
     $results = @()
     
-    switch ($Endpoint) {
-        "deviceConfigurations" { $uri = $BaseUrl + "/deviceManagement/deviceConfigurations" + $FilterQuery }
-        "configurationPolicies" { $uri = $BaseUrl + "/deviceManagement/configurationPolicies" + $FilterQuery }
-        "policySets" { $uri = $BaseUrl + "/deviceAppManagement/policySets" + $FilterQuery }
-    }
+    $uri = $BaseUrl + $EndPoint + $Query 
+
     Write-Verbose "Invoke-GMSIntuneGraphRequest: $Method $uri"
     
     $headers = @{
@@ -38,12 +34,13 @@ function Invoke-GMSIntuneGraphRequest {
     }
     
     $response = Invoke-MgGraphRequest -Uri $Uri -Method $Method -Headers $headers -OutputType Json | ConvertFrom-Json
-    $results = $response.value
+    $results = $response.value ? $response.value : $response
+
     if ($Paging) {
         While ($response.'@odata.nextLink') {
             Write-Verbose "Invoke-GMSIntuneGraphRequest: paging with nextLink: $($response.'@odata.nextLink')"
             $response = Invoke-MgGraphRequest -Uri $response.'@odata.nextLink' -Method Get -Headers $headers -OutputType Json | ConvertFrom-Json
-            $results += $response.value
+            $results += $response.value ? $response.value : $response
         }
     }
 

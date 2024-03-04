@@ -9,22 +9,26 @@ function Get-GMSIntuneConfigurationObjects {
     $configurationObjectTypes | ForEach-Object {
         $outputFolder = "C:\repos\jll.io Consultancy\intune-management\$($_.GMSObjectType)"
         if (-not (Test-Path $outputFolder)) {
-            New-Item -ItemType Directory -Path $outputFolder
-        }
-    
-        # Retrieve all settings policy sets
-        
-        if($_.ExpandQuery){
-            $objectSet = Invoke-GMSIntuneGraphRequest -Endpoint $_.GMSObjectType -Method GET -Paging -Query $_.ExpandQuery
-        }
-        else{
-            $objectSet = Invoke-GMSIntuneGraphRequest -Endpoint $_.GMSObjectType -Method GET -Paging
+            New-Item -ItemType Directory -Path $outputFolder \ Out-Null
         }
 
-    
+        $objectSet = Invoke-GMSIntuneGraphRequest -Endpoint $_.ApiEndpoint -Method GET -Paging
+
+        if($_.ExpandQuery){
+            $configurationObject = $_
+            $expandedObjectSet = @()
+            $objectSet | ForEach-Object {
+                $expandedObjectSet += Invoke-GMSIntuneGraphRequest -Endpoint "$($configurationObject.ApiEndpoint)/$($_.id)" -Method GET -Query $configurationObject.ExpandQuery
+            }
+
+            $objectSet = $expandedObjectSet
+        }
+
+        Write-Verbose "Retrieved $($objectSet.Count) objects of type $($_.GMSObjectType)"
+
         foreach ($object in $objectSet) {
             # Set file identifier for the object
-            $fileIdentifier = $Global:GMSIntuneConfigurationObjects | Where-Object GMSObjectType -eq $_.GMSObjectType | Select-Object -ExpandProperty GMSFileIdentifier
+            $fileIdentifier = $_.GMSFileIdentifier
 
             # Sanitize the display name to avoid illegal characters in the file name
             $displayName = $object.$fileIdentifier -replace '[\\\/\:\*\?\"\<\>\|]', ''

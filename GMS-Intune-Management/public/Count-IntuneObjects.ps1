@@ -1,7 +1,7 @@
 function Count-IntuneObjects {
     @{
-        deviceConfigurationsCount  = (Invoke-GMSIntuneGraphRequest -Endpoint deviceConfigurations -Method GET).Count
-        configurationPoliciesCount = (Invoke-GMSIntuneGraphRequest -Endpoint configurationPolicies -Method GET -Paging).Count
-        policySetsCount            = (Invoke-GMSIntuneGraphRequest -Endpoint policySets -Method GET -Paging).Count
+        deviceConfigurationsCount  = (Invoke-GMSIntuneGraphRequest -Endpoint $($global:GMSIntuneConfigurationObjects | ? GMSObjectType -eq 'deviceConfigurations').ApiEndpoint -Method GET).Count
+        configurationPoliciesCount = (Invoke-GMSIntuneGraphRequest -Endpoint $($global:GMSIntuneConfigurationObjects | ? GMSObjectType -eq 'configurationPolicies').ApiEndpoint -Method GET -Paging).Count
+        policySetsCount            = (Invoke-GMSIntuneGraphRequest -Endpoint $($global:GMSIntuneConfigurationObjects | ? GMSObjectType -eq 'policySets').ApiEndpoint -Method GET -Paging).Count
     }
 }
