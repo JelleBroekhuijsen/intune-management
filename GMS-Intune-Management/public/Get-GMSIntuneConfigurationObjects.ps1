@@ -11,9 +11,6 @@ function Get-GMSIntuneConfigurationObjects {
         if (-not (Test-Path $outputFolder)) {
             New-Item -ItemType Directory -Path $outputFolder
         }
-        else {
-            Remove-Item -Path $outputFolder\* -Recurse -Force
-        }
     
         # Retrieve all settings policy sets
         
