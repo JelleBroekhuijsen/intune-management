@@ -19,7 +19,10 @@ function Invoke-GMSIntuneGraphRequest {
 
         [Parameter()]
         [Switch]
-        $Paging
+        $Paging,
+
+        [Parameter()]
+        $Body
     )
 
     $results = @()
@@ -27,21 +30,24 @@ function Invoke-GMSIntuneGraphRequest {
     $uri = $BaseUrl + $EndPoint + $Query 
 
     Write-Verbose "Invoke-GMSIntuneGraphRequest: $Method $uri"
+
+    if ($Method -eq "GET") {
+        $response = Invoke-MgGraphRequest -Uri $Uri -Method $Method -ContentType 'application/json' -OutputType Json | ConvertFrom-Json
+        $results = $response.value ? $response.value : $response
     
-    $headers = @{
-        "Content-Type" = "application/json;charset=utf-8"
-        "Accept"       = "application/json;odata.metadata=full"
+        if ($Paging) {
+            While ($response.'@odata.nextLink') {
+                Write-Verbose "Invoke-GMSIntuneGraphRequest: paging with nextLink: $($response.'@odata.nextLink')"
+                $response = Invoke-MgGraphRequest -Uri $response.'@odata.nextLink' -Method Get  -ContentType 'application/json' -OutputType Json | ConvertFrom-Json
+                $results += $response.value ? $response.value : $response
+            }
+        }
     }
     
-    $response = Invoke-MgGraphRequest -Uri $Uri -Method $Method -Headers $headers -OutputType Json | ConvertFrom-Json
-    $results = $response.value ? $response.value : $response
-
-    if ($Paging) {
-        While ($response.'@odata.nextLink') {
-            Write-Verbose "Invoke-GMSIntuneGraphRequest: paging with nextLink: $($response.'@odata.nextLink')"
-            $response = Invoke-MgGraphRequest -Uri $response.'@odata.nextLink' -Method Get -Headers $headers -OutputType Json | ConvertFrom-Json
-            $results += $response.value ? $response.value : $response
-        }
+    if ($Method -eq "POST") {
+        Write-Verbose "Invoke-GMSIntuneGraphRequest with headers: $($headers.values)"
+        $response = Invoke-MgGraphRequest -Uri $Uri -Method $Method -ContentType 'application/json' -Body $Body
+        $results = $response
     }
 
     $results
