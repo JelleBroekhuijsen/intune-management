@@ -3,7 +3,11 @@ function Get-GMSIntuneConfigurationObjects {
     param (
         [Parameter(Mandatory)]
         [object[]]
-        $configurationObjectTypes,
+        $ConfigurationObjectTypes,
+
+        [Parameter()]
+        [switch]
+        $SkipExpand,
 
         [Parameter()]
         [switch]
@@ -15,7 +19,7 @@ function Get-GMSIntuneConfigurationObjects {
         $configurationObjectType = $_
 
         # If the object type has an expand query, we need to retrieve the objects one by one
-        if ($_.ExpandQuery) {
+        if ($_.ExpandQuery -and -not $SkipExpand) {
             $expandedObjectSet = @()
             $objectSet | ForEach-Object {
                 $expandedObjectSet += Invoke-GMSIntuneGraphRequest -Endpoint "$($configurationObjectType.ApiEndpoint)/$($_.id)" -Method GET -Query $configurationObjectType.ExpandQuery
