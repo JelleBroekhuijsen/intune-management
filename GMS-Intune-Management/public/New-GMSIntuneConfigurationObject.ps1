@@ -12,5 +12,6 @@ Function New-GMSIntuneConfigurationObject {
 
     $body = $configurationObject | ConvertTo-Json -Depth 100
 
+    Write-Verbose "New-GMSIntuneConfigurationObject: $($configurationObject.$($configurationObjectType.GMSFileIdentifier))"
     Invoke-GMSIntuneGraphRequest -Endpoint $configurationObjectType.ApiEndpoint -Method POST -Body $body | Out-Null
 }

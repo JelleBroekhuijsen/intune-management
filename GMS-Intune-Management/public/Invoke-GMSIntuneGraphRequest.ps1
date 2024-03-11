@@ -1,4 +1,5 @@
 function Invoke-GMSIntuneGraphRequest {
+    [CmdletBinding()]
     param(
         [Parameter()]
         [string]
@@ -33,13 +34,13 @@ function Invoke-GMSIntuneGraphRequest {
 
     if ($Method -eq "GET") {
         $response = Invoke-MgGraphRequest -Uri $Uri -Method $Method -ContentType 'application/json' -OutputType Json | ConvertFrom-Json
-        $results = $response.value ? $response.value : $response
+        $results = $response.value ? $response.value : $null
     
         if ($Paging) {
             While ($response.'@odata.nextLink') {
                 Write-Verbose "Invoke-GMSIntuneGraphRequest: paging with nextLink: $($response.'@odata.nextLink')"
                 $response = Invoke-MgGraphRequest -Uri $response.'@odata.nextLink' -Method Get  -ContentType 'application/json' -OutputType Json | ConvertFrom-Json
-                $results += $response.value ? $response.value : $response
+                $results += $response.value ? $response.value : $null
             }
         }
     }
@@ -47,6 +48,11 @@ function Invoke-GMSIntuneGraphRequest {
     if ($Method -eq "POST") {
         Write-Verbose "Invoke-GMSIntuneGraphRequest with headers: $($headers.values)"
         $response = Invoke-MgGraphRequest -Uri $Uri -Method $Method -ContentType 'application/json' -Body $Body
+        $results = $response
+    }
+
+    if ($Method -eq "DELETE") {
+        $response = Invoke-MgGraphRequest -Uri $Uri -Method $Method -ContentType 'application/json'
         $results = $response
     }
 

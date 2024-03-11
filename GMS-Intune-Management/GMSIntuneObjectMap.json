@@ -2,7 +2,8 @@
     {
         "GMSObjectType": "deviceConfigurations",
         "GMSFileIdentifier": "displayName",
-        "ApiEndpoint": "/deviceManagement/deviceConfigurations"
+        "ApiEndpoint": "/deviceManagement/deviceConfigurations",
+        "getOmaSettingPlainTextValue": true
     },
     {
         "GMSObjectType": "policySets",
