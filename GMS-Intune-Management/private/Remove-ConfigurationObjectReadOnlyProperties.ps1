@@ -18,17 +18,27 @@ Function Remove-ConfigurationObjectReadOnlyProperties {
         "id",
         "lastModifiedDateTime",
         "modifiedDateTime",
-        "supportsScopeTags"
+        "supportsScopeTags",
+        "errorCode",
+        "status"
     )
     $propertiesToRemove += $readOnlyProperties
 
+    if($configurationObject."@odata.type" -eq "#microsoft.graph.deviceConfigurationPolicySetItem") {
+        $additionalPropertiesToRemove = @(
+            "displayName",
+            "guidedDeploymentTags",
+            "itemType"
+        )
+        $propertiesToRemove += $additionalPropertiesToRemove
+    }
 
     # Add OData properties
     $configurationObject.PSObject.Properties | Where-Object { $_.Name -like "*@Odata*link" -or $_.Name -like "*@odata.context" -or $_.Name -like "*@odata.id" -or ($_.Name -like "*@odata.type" -and $_.Name -ne "@odata.type") } | ForEach-Object {
         $propertiesToRemove += $_.Name
     }
 
-    # Remove properties
+        # Remove properties
     foreach ($property in $propertiesToRemove) {
         $configurationObject = Remove-PropertyFromObject -object $configurationObject -property $property
     }

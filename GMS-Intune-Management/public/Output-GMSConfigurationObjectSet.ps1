@@ -21,8 +21,8 @@ Function Output-GMSConfigurationObjectSet {
         $fileIdentifier = $configurationObjectType.GMSFileIdentifier
 
         # Sanitize the display name to avoid illegal characters in the file name
-        $displayName = $object.$fileIdentifier -replace '[\\\/\:\*\?\"\<\>\|]', ''
+        $filename = Format-PolicyFileName $object.$fileIdentifier
 
-        $object | ConvertTo-Json -Depth 100 | Out-File -FilePath "$outputFolder\$($displayName).json" -Force
+        $object | ConvertTo-Json -Depth 100 | Out-File -FilePath "$outputFolder\$($filename).json" -Force
     }
 }

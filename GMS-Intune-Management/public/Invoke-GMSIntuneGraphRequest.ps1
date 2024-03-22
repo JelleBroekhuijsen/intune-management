@@ -34,13 +34,13 @@ function Invoke-GMSIntuneGraphRequest {
 
     if ($Method -eq "GET") {
         $response = Invoke-MgGraphRequest -Uri $Uri -Method $Method -ContentType 'application/json' -OutputType Json | ConvertFrom-Json
-        $results = $response.value ? $response.value : $null
+        $results = $response.value ? $response.value : $response
     
         if ($Paging) {
             While ($response.'@odata.nextLink') {
                 Write-Verbose "Invoke-GMSIntuneGraphRequest: paging with nextLink: $($response.'@odata.nextLink')"
                 $response = Invoke-MgGraphRequest -Uri $response.'@odata.nextLink' -Method Get  -ContentType 'application/json' -OutputType Json | ConvertFrom-Json
-                $results += $response.value ? $response.value : $null
+                $results += $response.value ? $response.value : $response
             }
         }
     }
